@@ -36,3 +36,22 @@ Feature: Posts API
     Examples:
       | title                  | body                                                    | userId |
       | 101 Dalmatians Request | Request body for creating a new post for 101 Dalmatians | 101    |
+
+  Scenario: Retrieve a specific post by ID error (structural error in JSON)
+    When I send a POST request to "/posts" with a structurally invalid JSON body
+    Then the response status should be 400
+    And the response Content-Type should be "application/json"
+    And the response body should contain a field "error"
+    And the "error" field should equal "Invalid JSON format"
+
+  Scenario: Missing required field in JSON
+    When I send a POST request to "/posts" with a JSON body missing the "title" field
+    Then the response status should be 422
+    And the response body should contain a field "error"
+    And the "error" field should equal "Missing required field: title"
+
+  Scenario: Invalid data type in JSON
+    When I send a POST request to "/posts" with "title" as a number instead of a string
+    Then the response status should be 422
+    And the response body should contain a field "error"
+    And the "error" field should equal "Invalid data type for field: title"

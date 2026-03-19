@@ -53,12 +53,54 @@ When('I send a POST request to {string} with the following body:') do |endpoint,
   headers = { 'Content-Type' => 'application/json' }
 
   @response = HTTParty.post(@url,
-    headers: headers,
-    body: request_body
-  )
-
+                            headers: headers,
+                            body: request_body)
 end
 
 Then('the response body should match the {string} schema') do |schema_name|
   expect(@response.body).to match_json_schema(schema_name)
+end
+
+When('I send a POST request to {string} with a structurally invalid JSON body') do |endpoint|
+  @url = "#{BASE_URL}/#{endpoint}"
+  invalid_json = '{ "title": "Invalid JSON", "body": "Test body", }' # vírgula sobrando
+
+  @response = HTTParty.post(@url,
+                            body: invalid_json, # string crua
+                            headers: { 'Content-Type' => 'application/json' })
+end
+
+Then('the response Content-Type should be {string}') do |expected_type|
+  actual_type = @response.headers['content-type']
+  expect(actual_type).to include(expected_type)
+end
+
+Then('the response body should contain a field {string}') do |field|
+  parsed = JSON.parse(@response.body)
+  expect(parsed).to have_key(field)
+end
+
+Then('the {string} field should equal {string}') do |field, expected_value|
+  parsed = JSON.parse(@response.body)
+  expect(parsed[field]).to eq(expected_value)
+end
+
+When('I send a POST request to {string} with a JSON body missing the {string} field') do |endpoint, missing_field|
+  @url = "#{BASE_URL}/#{endpoint}"
+  body = { "title" => "Teste JSON", "body" => "Test body" }
+  body.delete(missing_field) # remove o campo especificado
+
+  @response = HTTParty.post(@url,
+                            body: body.to_json,
+                            headers: { 'Content-Type' => 'application/json' })
+end
+
+When('I send a POST request to {string} with {string} as a number instead of a string') do |endpoint, field|
+  @url = "#{BASE_URL}/#{endpoint}"
+  body = { "title" => "Valid title", "body" => "Valid body" }
+  body[field] = 12345
+
+  @response = HTTParty.post(@url,
+                            body: body.to_json,
+                            headers: { 'Content-Type' => 'application/json' })
 end
