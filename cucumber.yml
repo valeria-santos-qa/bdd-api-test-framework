@@ -1,1 +1,1 @@
-html_report: --format pretty --format html --out report/report.html features
+html_report: --format pretty --format html --out report/cucumber_native/report.html features

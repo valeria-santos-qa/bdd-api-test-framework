@@ -48,7 +48,7 @@ jobs:
           "
 
       - name: Upload smoke HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: smoke-html-report
           path: report/smoke_report.html
@@ -94,7 +94,7 @@ jobs:
           "
 
       - name: Upload full HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: full-html-report
           path: report/full_report.html
