@@ -19,17 +19,39 @@ jobs:
         with:
           ruby-version: '3.2'
 
-      - name: Install dependencies
+      - name: Install Ruby dependencies
         run: bundle install
 
       - name: Run smoke tests
         run: bundle exec cucumber features/smoke/ --format json --out report/smoke.json
 
-      - name: Upload smoke report
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install cucumber-html-reporter
+        run: npm install cucumber-html-reporter
+
+      - name: Generate smoke HTML report
+        run: |
+          node -e "
+          const reporter = require('cucumber-html-reporter');
+          const options = {
+            theme: 'bootstrap',
+            jsonFile: 'report/smoke.json',
+            output: 'report/smoke_report.html',
+            reportSuiteAsScenarios: true,
+            launchReport: false
+          };
+          reporter.generate(options);
+          "
+
+      - name: Upload smoke HTML report
         uses: actions/upload-artifact@v3
         with:
-          name: smoke-report
-          path: report/
+          name: smoke-html-report
+          path: report/smoke_report.html
 
   full-tests:
     runs-on: ubuntu-latest
@@ -43,14 +65,36 @@ jobs:
         with:
           ruby-version: '3.2'
 
-      - name: Install dependencies
+      - name: Install Ruby dependencies
         run: bundle install
 
       - name: Run full test suite
         run: bundle exec cucumber --format json --out report/full.json
 
-      - name: Upload full report
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install cucumber-html-reporter
+        run: npm install cucumber-html-reporter
+
+      - name: Generate full HTML report
+        run: |
+          node -e "
+          const reporter = require('cucumber-html-reporter');
+          const options = {
+            theme: 'bootstrap',
+            jsonFile: 'report/full.json',
+            output: 'report/full_report.html',
+            reportSuiteAsScenarios: true,
+            launchReport: false
+          };
+          reporter.generate(options);
+          "
+
+      - name: Upload full HTML report
         uses: actions/upload-artifact@v3
         with:
-          name: full-report
-          path: report/
+          name: full-html-report
+          path: report/full_report.html
