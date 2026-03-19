@@ -31,6 +31,7 @@ Feature: Posts API
     Then the response status should be 201
     And the response should contain a post with title "<title>"
     And the response should contain a post with body "<body>"
+    Then the response body should match the "create_post_response" schema
 
     Examples:
       | title                  | body                                                    | userId |

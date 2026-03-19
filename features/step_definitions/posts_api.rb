@@ -58,3 +58,7 @@ When('I send a POST request to {string} with the following body:') do |endpoint,
   )
 
 end
+
+Then('the response body should match the {string} schema') do |schema_name|
+  expect(@response.body).to match_json_schema(schema_name)
+end
