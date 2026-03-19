@@ -1,0 +1,56 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  smoke-tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run smoke tests
+        run: bundle exec cucumber features/smoke/ --format json --out report/smoke.json
+
+      - name: Upload smoke report
+        uses: actions/upload-artifact@v3
+        with:
+          name: smoke-report
+          path: report/
+
+  full-tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run full test suite
+        run: bundle exec cucumber --format json --out report/full.json
+
+      - name: Upload full report
+        uses: actions/upload-artifact@v3
+        with:
+          name: full-report
+          path: report/
