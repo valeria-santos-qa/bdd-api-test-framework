@@ -48,6 +48,7 @@ jobs:
           "
 
       - name: Upload smoke HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: smoke-html-report
@@ -94,6 +95,7 @@ jobs:
           "
 
       - name: Upload full HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: full-html-report
